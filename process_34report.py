@@ -2,9 +2,21 @@
 
 from PyPDF2 import PdfFileReader, PdfFileWriter
 import subprocess
+import os
 
 
-def split(fname, outdir, parallel=True):
+# TODO: rename the extracted files based on the person's name
+# TODO: handle the banner of shame for p21 extraction
+
+
+def process(r34_fname, r34_dir, p21_dir):
+    '''process the 34 report - do all the things we need with this file:
+    split the file into the individual reports
+    extract page 21 and join the pages into a single report
+    '''
+    split_and_extract(r34_fname, r34_dir, p21_dir)
+
+def split_and_extract(fname, r34_outdir, p21_outdir, parallel=True):
     '''Split a Gallup full 34 report into the individual files
     @arg fname: name of the file to split
     @arg outdir: the output directory to put all the split files into
@@ -29,12 +41,20 @@ def split(fname, outdir, parallel=True):
         stop_page_num = start_page_num + 25
         if stop_page_num > numpages:
             stop_page_num = numpages
-        out_fname = fname_fmt.format(outdir, report_num)
+        p21 = (report_num * 26) + 1 + 20
+        r34_fname = fname_fmt.format(r34_outdir, report_num)
+        p21_fname = fname_fmt.format(p21_outdir, report_num)
         print("Page {}: {}".format(start_page_num, report_num))
         if parallel:
-            proc = subprocess.Popen(["gs", "-dBATCH",  '-sOutputFile={}'.format(out_fname),
+            proc = subprocess.Popen(["gs", "-dBATCH",  '-sOutputFile={}'.format(r34_fname),
                                      "-dFirstPage={}".format(start_page_num),
                                      "-dLastPage={}".format(stop_page_num),
+                                     "-sDEVICE=pdfwrite", fname], stdin=subproc_stdin,
+                                     stdout=subprocess.DEVNULL)
+            procs.append(proc)
+            proc = subprocess.Popen(["gs", "-dBATCH",  '-sOutputFile={}'.format(p21_fname),
+                                     "-dFirstPage={}".format(p21),
+                                     "-dLastPage={}".format(p21),
                                      "-sDEVICE=pdfwrite", fname], stdin=subproc_stdin,
                                      stdout=subprocess.DEVNULL)
             procs.append(proc)
@@ -46,6 +66,7 @@ def split(fname, outdir, parallel=True):
                             stdout=subprocess.DEVNULL)
     for proc in procs:
         proc.wait()
+    os.remove('gs_input')
 
 if __name__ == '__main__':
     import sys
