@@ -10,8 +10,9 @@ def split(fname, outdir, parallel=True):
     @arg outdir: the output directory to put all the split files into
     '''
     reader = PdfFileReader(fname)
-    report_count = reader.getNumPages() // 26
-    if reader.getNumPages() % 26 != 0:
+    numpages = reader.getNumPages()
+    report_count = numpages // 26
+    if numpages % 26 != 0:
         report_count += 1
     if report_count > 10:
         fname_fmt = '{}/{:02d}.pdf'
@@ -26,8 +27,8 @@ def split(fname, outdir, parallel=True):
     for report_num in range(report_count):
         start_page_num = (report_num * 26) + 1
         stop_page_num = start_page_num + 25
-        if stop_page_num > reader.getNumPages():
-            stop_page_num = reader.getNumPages()
+        if stop_page_num > numpages:
+            stop_page_num = numpages
         out_fname = fname_fmt.format(outdir, report_num)
         print("Page {}: {}".format(start_page_num, report_num))
         if parallel:
