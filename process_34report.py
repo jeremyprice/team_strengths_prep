@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-from PyPDF2 import PdfFileReader, PdfFileWriter
-import subprocess
 import os
+import os.path
 import fitz
 
 
@@ -33,57 +32,35 @@ def find_name(doc, page_num, no_spaces=True):
         name = name.replace(' ', '')
     return name
 
-def split_and_extract(fname, r34_outdir, p21_outdir, parallel=True):
+def split_and_extract(fname, r34_outdir, p21_outdir):
     '''Split a Gallup full 34 report into the individual files
     @arg fname: name of the file to split
-    @arg outdir: the output directory to put all the split files into
+    @arg r34_outdir: the output directory to put all the 34 report split files into
+    @arg p21_outdir: the output directory to put all the p21 extracted files into
     '''
-    reader = PdfFileReader(fname)
     doc = fitz.open(fname)
-    numpages = reader.getNumPages()
+    numpages = doc.pageCount
     report_count = numpages // 26
     if numpages % 26 != 0:
         report_count += 1
     fname_34fmt = os.path.join(r34_outdir, '{}-34report.pdf')
     fname_21fmt = os.path.join(p21_outdir, '{}-p21.pdf')
-    with open('gs_input', 'wb') as outfile:
-        outfile.write(b'\n' * 1000)
-    subproc_stdin = open('gs_input', 'rb')
-    procs = []
     for report_num in range(report_count):
-        start_page_num = (report_num * 26) + 1
-        stop_page_num = start_page_num + 25
-        if stop_page_num > numpages:
-            stop_page_num = numpages
-        p21 = (report_num * 26) + 1 + 20
+        start_page_num = (report_num * 26)
+        stop_page_num = start_page_num + 25  # we only need the first 25 pages since the last is blank
         person_name = find_name(doc, start_page_num)
         print(person_name)
         r34_fname = fname_34fmt.format(person_name)
         p21_fname = fname_21fmt.format(person_name)
         print("Page {}: {}".format(start_page_num, report_num))
-        if parallel:
-            proc = subprocess.Popen(["gs", "-dBATCH",  '-sOutputFile={}'.format(r34_fname),
-                                     "-dFirstPage={}".format(start_page_num),
-                                     "-dLastPage={}".format(stop_page_num),
-                                     "-sDEVICE=pdfwrite", fname], stdin=subproc_stdin,
-                                     stdout=subprocess.DEVNULL)
-            procs.append(proc)
-            proc = subprocess.Popen(["gs", "-dBATCH",  '-sOutputFile={}'.format(p21_fname),
-                                     "-dFirstPage={}".format(p21),
-                                     "-dLastPage={}".format(p21),
-                                     "-sDEVICE=pdfwrite", fname], stdin=subproc_stdin,
-                                     stdout=subprocess.DEVNULL)
-            procs.append(proc)
-        else:
-            subprocess.run(["gs", "-dBATCH",  '-sOutputFile={}'.format(out_fname),
-                            "-dFirstPage={}".format(start_page_num),
-                            "-dLastPage={}".format(stop_page_num),
-                            "-sDEVICE=pdfwrite", fname], stdin=subproc_stdin,
-                            stdout=subprocess.DEVNULL)
-    for proc in procs:
-        proc.wait()
-    os.remove('gs_input')
+        doc.select(range(start_page_num, stop_page_num))
+        doc.save(r34_fname)
+        doc.select([20])
+        doc.save(p21_fname)
+        doc.close()
+        doc = fitz.open(fname)
+
 
 if __name__ == '__main__':
     import sys
-    split(sys.argv[1], sys.argv[2])
+    process(*sys.argv[1:])
