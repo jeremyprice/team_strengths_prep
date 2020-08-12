@@ -5,12 +5,12 @@ import os.path
 import fitz
 
 
-def process(r34_fname, r34_dir, p21_dir):
+def process(r34_fname, r34_dir, p21_dir, base_fname):
     '''process the 34 report - do all the things we need with this file:
     split the file into the individual reports
     extract page 21 and join the pages into a single report
     '''
-    split_and_extract(r34_fname, r34_dir, p21_dir)
+    split_and_extract(r34_fname, r34_dir, p21_dir, base_fname)
 
 def find_name(page, no_spaces=True):
     blocks = page.getText('blocks')
@@ -34,11 +34,12 @@ def check_for_caution(page):
     # if there is a block with this text, we have a caution page
     return len(name_blocks) == 1
 
-def split_and_extract(fname, r34_outdir, p21_outdir):
+def split_and_extract(fname, r34_outdir, p21_outdir, base_fname):
     '''Split a Gallup full 34 report into the individual files
     @arg fname: name of the file to split
     @arg r34_outdir: the output directory to put all the 34 report split files into
     @arg p21_outdir: the output directory to put all the p21 extracted files into
+    @arg base_fname: the base filename to prepend to any generated files {}-p21.pdf
     '''
     doc = fitz.open(fname)
     numpages = doc.pageCount
@@ -47,6 +48,7 @@ def split_and_extract(fname, r34_outdir, p21_outdir):
         report_count += 1
     fname_34fmt = os.path.join(r34_outdir, '{}-34report.pdf')
     fname_21fmt = os.path.join(p21_outdir, '{}-p21.pdf')
+    p21_all = []
     for report_num in range(report_count):
         start_page_num = (report_num * 26)
         stop_page_num = start_page_num + 25  # we only need the first 25 pages since the last is blank
@@ -65,6 +67,13 @@ def split_and_extract(fname, r34_outdir, p21_outdir):
         doc.save(p21_fname, garbage=4, clean=1, deflate=1)
         doc.close()
         doc = fitz.open(fname)
+        # hang on to the person's name and p21 index so we can save it to it's own file
+        p21_all.append((person_name, start_page_num + p21))
+    # save all the p21s to a single file
+    p21_all.sort()  # sort the pages by first name alphabetical
+    doc.select([p[1] for p in p21_all])
+    p21_fname = '{}-p21.pdf'.format(base_fname)
+    doc.save(p21_fname, garbage=4, clean=1, deflate=1)
 
 
 if __name__ == '__main__':

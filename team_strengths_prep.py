@@ -22,6 +22,8 @@ def prep_34report(staging_dir, r34_dir, p21_dir, r34_fname):
 
 def main():
     r34_fname = sys.argv[1]
+    list34_fname = sys.argv[2]
+    base_fname = sys.argv[3]
     r34_dir = '34reports'
     p21_dir = 'p21'
     # TODO: use a temporary staging dir so it will clean up the files when we're done
@@ -32,7 +34,7 @@ def main():
     prev_dir = os.getcwd()
     os.chdir(staging_dir_name)
     r34_fname = os.path.basename(r34_fname)
-    process_34report.process(r34_fname, r34_dir, p21_dir)
+    process_34report.process(r34_fname, r34_dir, p21_dir, base_fname)
     os.chdir(prev_dir)
 
 if __name__ == '__main__':
