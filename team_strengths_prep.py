@@ -24,6 +24,7 @@ def main():
     r34_fname = sys.argv[1]
     r34_dir = '34reports'
     p21_dir = 'p21'
+    # TODO: use a temporary staging dir so it will clean up the files when we're done
     # staging_dir = tempfile.TemporaryDirectory()
     # staging_dir_name = staging_dir.name
     staging_dir_name = 'staging'
