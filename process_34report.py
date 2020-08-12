@@ -5,10 +5,6 @@ import os.path
 import fitz
 
 
-# TODO: rename the extracted files based on the person's name
-# TODO: handle the banner of shame for p21 extraction
-
-
 def process(r34_fname, r34_dir, p21_dir):
     '''process the 34 report - do all the things we need with this file:
     split the file into the individual reports
