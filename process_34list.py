@@ -24,7 +24,7 @@ def save_34list(info, base_fname):
         ws.write(0, theme+1, 'Theme {}'.format(theme))
     for row, person in enumerate(info):
         for col in range(0, len(person)):
-            ws.write(row+1, col, person[col])
+            ws.write_string(row+1, col, person[col])
     # add in the autofilter drop downs
     ws.autofilter(0, 0, len(info), 35)
     wb.close()
