@@ -25,6 +25,8 @@ def save_34list(info, base_fname):
     for row, person in enumerate(info):
         for col in range(0, len(person)):
             ws.write(row+1, col, person[col])
+    # add in the autofilter drop downs
+    ws.autofilter(0, 0, len(info), 35)
     wb.close()
 
 def first_last_name(name_lf):
