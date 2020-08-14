@@ -4,6 +4,7 @@
 
 import xlsxwriter
 import strengths
+from xlsxwriter.utility import xl_rowcol_to_cell
 
 def write_domain_header(wb, ws, row, start_col, domain):
     first_fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
@@ -31,7 +32,7 @@ def build_matrix(wb, ws, info):
     fmt = wb.add_format({'valign': 'vcenter', 'bold': True, 'font_size': 11, 'align': 'center'})
     ws.merge_range(2, 0, 2, 2, 'Team Name', fmt)
     ws.hide_gridlines(2)
-    # build the header row of strengths
+    # build the header row of strengths with the black spacer columns
     fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
                          'rotation': 60, 'font_color': 'white', 'bg_color': '#25457E',
                          'top': 2, 'left': 2, 'right': 2})
@@ -40,20 +41,85 @@ def build_matrix(wb, ws, info):
     start_col = 1
     write_domain_header(wb, ws, 3, start_col, strengths.executing)
     start_col += len(strengths.executing)
-    ws.write_string(3, start_col, '', spacer_fmt)
+    for row in range(3, len(info)+5):
+        ws.write_string(row, start_col, '', spacer_fmt)
     start_col += 1
     write_domain_header(wb, ws, 3, start_col, strengths.strategic_thinking)
     start_col += len(strengths.strategic_thinking)
-    ws.write_string(3, start_col, '', spacer_fmt)
+    for row in range(3, len(info)+5):
+        ws.write_string(row, start_col, '', spacer_fmt)
     start_col += 1
     write_domain_header(wb, ws, 3, start_col, strengths.influencing)
     start_col += len(strengths.influencing)
-    ws.write_string(3, start_col, '', spacer_fmt)
+    for row in range(3, len(info)+5):
+        ws.write_string(row, start_col, '', spacer_fmt)
     start_col += 1
     write_domain_header(wb, ws, 3, start_col, strengths.relationship_building)
     start_col += len(strengths.relationship_building)
     ws.set_column(1, start_col, 4)
+    # build the name + strengths rows
+    name_fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
+                              'font_color': 'white', 'bg_color': '#5A88D6'})
+    odd_fmt =  wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'center',
+                              'font_color': 'black', 'bg_color': 'white', 'top': 1, 'bottom': 1})
+    even_fmt =  wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'center',
+                               'font_color': 'black', 'bg_color': '#D9D9D9', 'top': 1, 'bottom': 1})
+    count_fmt = wb.add_format({'left': 2})
+    for row in range(4, len(info)+4):
+        if row % 2 == 0:
+            fmt = even_fmt
+        else:
+            fmt = odd_fmt
+        name = "=IF(ISBLANK('Names and Strengths'!A{0:d}), \"\", 'Names and Strengths'!A{0:d})".format(row-2)
+        ws.write_formula(row, 0, name, name_fmt)
+        bit_row = len(info) + row
+        formula = "=IF('Names and Strengths'!{0:s}{1:d}=1,\"x\",\" \")"
+        start_col = 1
+        for idx in range(len(strengths.executing)):
+            col = chr(ord('B') + idx)
+            ws.write_formula(row, idx+start_col, formula.format(col, bit_row), fmt)
+        start_col += len(strengths.executing) + 1  # space column
+        for idx in range(len(strengths.strategic_thinking)):
+            col = chr(ord('K') + idx)
+            ws.write_formula(row, idx+start_col, formula.format(col, bit_row), fmt)
+        start_col += len(strengths.strategic_thinking) + 1  # space column
+        for idx in range(len(strengths.influencing)):
+            col = chr(ord('S') + idx)
+            ws.write_formula(row, idx+start_col, formula.format(col, bit_row), fmt)
+        start_col += len(strengths.influencing) + 1  # space column
+        for idx in range(len(strengths.relationship_building)):
+            col = 'A' + chr(ord('A') + idx)
+            ws.write_formula(row, idx+start_col, formula.format(col, bit_row), fmt)
+        start_col += len(strengths.relationship_building)
+        # the count-check column at the far right
+        formula = '=COUNTIF(B{0:d}:AL{0:d},"x")'.format(row + 1)
+        ws.write_formula(row, start_col, formula, count_fmt)
+    row = len(info) + 4
+    total_fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
+                               'font_color': 'white', 'bg_color': '#5A88D6', 'bottom': 2})
+    num_fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'center',
+                             'font_color': 'white', 'bg_color': '#5A88D6', 'border': 2})
+    start_col = 0
+    ws.write_string(row, start_col, 'Totals', total_fmt)
+    start_col = 1
+    row_range = (4, len(info)+3)
+    insert_totals(ws, row, start_col, start_col+len(strengths.executing), row_range, num_fmt)
+    start_col += len(strengths.executing) + 1  # space column
+    insert_totals(ws, row, start_col, start_col+len(strengths.strategic_thinking), row_range, num_fmt)
+    start_col += len(strengths.strategic_thinking) + 1  # space column
+    insert_totals(ws, row, start_col, start_col+len(strengths.influencing), row_range, num_fmt)
+    start_col += len(strengths.influencing) + 1  # space column
+    insert_totals(ws, row, start_col, start_col+len(strengths.relationship_building), row_range, num_fmt)
+    # autofit the name column based on the longest name
+    width = max([len(s[0]) for s in info])
+    ws.set_column(0, 0, width)
 
+def insert_totals(ws, row, start_col, end_col, row_range, fmt):
+    formula = '=COUNTIF({0:s}:{1:s},"x")'
+    for col in range(start_col, end_col):
+        c1 = xl_rowcol_to_cell(row_range[0], col)
+        c2 = xl_rowcol_to_cell(row_range[1], col)
+        ws.write_formula(row, col, formula.format(c1, c2), fmt)
 
 def build_names_and_strengths(wb, ws, info):
     # write the header row
@@ -66,7 +132,8 @@ def build_names_and_strengths(wb, ws, info):
     # leave a blank row and write the lookup row
     sname_row = len(info) + 2
     center_fmt = wb.add_format({'align': 'center'})
-    [ws.write_string(sname_row, col+1, strength, center_fmt) for col, strength in enumerate(strengths.all34)]
+    sordered = strengths.executing + strengths.strategic_thinking + strengths.influencing + strengths.relationship_building
+    [ws.write_string(sname_row, col+1, strength, center_fmt) for col, strength in enumerate(sordered)]
     # build the top 10 counts
     row_start = len(info) + 3
     for row in range(row_start, row_start+len(info)):
@@ -74,9 +141,11 @@ def build_names_and_strengths(wb, ws, info):
         source_row = row-row_start+2
         ws.write_formula(row, 0, '=A{0:d}'.format(source_row))
         # the next columns count if the Strength occurs in the first 10 columns (top 10)
-        for col in range(1, 35):
-            formula = '=COUNTIF(B{0:d}:K{0:d}, "{1:s}")'.format(source_row, strengths.all34[col-1])
+        col = 1
+        for s in sordered:
+            formula = '=COUNTIF(B{0:d}:K{0:d}, "{1:s}")'.format(source_row, s)
             ws.write_formula(row, col, formula, center_fmt)
+            col += 1
     # autofit the columns based on the longest word in each column
     for col in range(35):  # name + 34 strengths
         width = max([len(s[col]) for s in info])

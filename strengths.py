@@ -9,7 +9,7 @@ strategic_thinking = ('Analytical', 'Context', 'Futuristic', 'Ideation', 'Input'
                       'Learner', 'Strategic')
 executing = ('Achiever', 'Arranger', 'Consistency', 'Deliberative', 'Belief', 'Discipline', 'Focus',
              'Responsibility', 'Restorative')
-influencing = ('Activator', 'Command', 'Communication', 'Competition', 'Maximizer', 'Self Assurance',
+influencing = ('Activator', 'Command', 'Communication', 'Competition', 'Maximizer', 'Self-Assurance',
                'Significance', 'Woo')
 relationship_building = ('Adaptability', 'Connectedness', 'Developer', 'Empathy', 'Harmony', 'Includer',
                          'Individualization', 'Positivity', 'Relator')

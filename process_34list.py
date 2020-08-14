@@ -14,6 +14,7 @@ def process(fname, base_fname):
 
 def save_34list(info, base_fname):
     '''save the updated and sorted data to a new Excel file'''
+    # TODO: set the column widths to the max string length of each column
     fname = '{}-34list.xlsx'.format(base_fname)
     wb = xlsxwriter.Workbook(fname)
     ws = wb.add_worksheet()
