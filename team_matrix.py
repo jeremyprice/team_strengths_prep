@@ -32,6 +32,11 @@ def build_matrix(wb, ws, info):
     fmt = wb.add_format({'valign': 'vcenter', 'bold': True, 'font_size': 11, 'align': 'center'})
     ws.merge_range(2, 0, 2, 2, 'Team Name', fmt)
     ws.hide_gridlines(2)
+    # build the domain headers
+    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12,
+                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Executing')})
+    col_end = 2 + len(strengths.executing)
+    ws.merge_range(1, 3, 1, col_end, 'Executing', fmt)
     # build the header row of strengths with the black spacer columns
     fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
                          'rotation': 60, 'font_color': 'white', 'bg_color': '#25457E',
@@ -110,6 +115,37 @@ def build_matrix(wb, ws, info):
     insert_totals(ws, row, start_col, start_col+len(strengths.influencing), row_range, num_fmt)
     start_col += len(strengths.influencing) + 1  # space column
     insert_totals(ws, row, start_col, start_col+len(strengths.relationship_building), row_range, num_fmt)
+
+    # put the team and domain counts at the bottom left
+    row = 33 + len(info)
+    ws.write_string(row, 0, 'team n')
+    c1 = xl_rowcol_to_cell(4, 1)
+    c2 = xl_rowcol_to_cell(3 + len(info), 1)
+    formula = '=SUMPRODUCT(--(LEN({0:s}:{1:s})>0))'.format(c1, c2)
+    ws.write_formula(row, 1, formula)
+    team_n = xl_rowcol_to_cell(row, 1)
+    row += 1
+    ws.write_string(row, 0, 'Executing n')
+    ws.write_formula(row, 1, '=9*{}'.format(team_n))
+    exec_n = xl_rowcol_to_cell(row, 1)
+    row += 1
+    ws.write_string(row, 0, 'Strat Thinking n')
+    ws.write_formula(row, 1, '=8*{}'.format(team_n))
+    st_think_n = xl_rowcol_to_cell(row, 1)
+    row += 1
+    ws.write_string(row, 0, 'Influencing n')
+    ws.write_formula(row, 1, '=8*{}'.format(team_n))
+    influencing_n = xl_rowcol_to_cell(row, 1)
+    row += 1
+    ws.write_string(row, 0, 'Rel Building n')
+    ws.write_formula(row, 1, '=9*{}'.format(team_n))
+    rel_build_n = xl_rowcol_to_cell(row, 1)
+    # put the domain header calculations up top
+    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12, 'num_format': '0%',
+                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Executing')})
+    col_end = 2 + len(strengths.executing)
+    r = (xl_rowcol_to_cell(4, 1), xl_rowcol_to_cell(3+len(info), len(strengths.executing)))
+    ws.merge_range(2, 3, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], exec_n), fmt)
     # autofit the name column based on the longest name
     width = max([len(s[0]) for s in info])
     ws.set_column(0, 0, width)
