@@ -37,6 +37,21 @@ def build_matrix(wb, ws, info):
                          'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Executing')})
     col_end = 2 + len(strengths.executing)
     ws.merge_range(1, 3, 1, col_end, 'Executing', fmt)
+    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12,
+                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Strategic Thinking')})
+    col_start = col_end + 2
+    col_end = col_start + len(strengths.strategic_thinking) - 1
+    ws.merge_range(1, col_start, 1, col_end, 'Strategic Thinking', fmt)
+    fmt = wb.add_format({'align': 'center', 'font_color': 'black', 'bold': True, 'font_size': 12,
+                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Influencing')})
+    col_start = col_end + 2
+    col_end = col_start + len(strengths.influencing) - 1
+    ws.merge_range(1, col_start, 1, col_end, 'Influencing', fmt)
+    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12,
+                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Relationship Building')})
+    col_start = col_end + 2
+    col_end = col_start + len(strengths.relationship_building) - 1
+    ws.merge_range(1, col_start, 1, col_end, 'Relationship Building', fmt)
     # build the header row of strengths with the black spacer columns
     fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
                          'rotation': 60, 'font_color': 'white', 'bg_color': '#25457E',
@@ -61,7 +76,8 @@ def build_matrix(wb, ws, info):
     start_col += 1
     write_domain_header(wb, ws, 3, start_col, strengths.relationship_building)
     start_col += len(strengths.relationship_building)
-    ws.set_column(1, start_col, 4)
+    # set the strengths column width - we add one extra column for the domain headers
+    ws.set_column(1, start_col+1, 4)
     # build the name + strengths rows
     name_fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
                               'font_color': 'white', 'bg_color': '#5A88D6'})
@@ -146,6 +162,30 @@ def build_matrix(wb, ws, info):
     col_end = 2 + len(strengths.executing)
     r = (xl_rowcol_to_cell(4, 1), xl_rowcol_to_cell(3+len(info), len(strengths.executing)))
     ws.merge_range(2, 3, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], exec_n), fmt)
+    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12, 'num_format': '0%',
+                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Strategic Thinking')})
+    col_start = col_end + 2
+    col_end += len(strengths.executing)
+    box_col_start = len(strengths.executing) + 2
+    box_col_end = box_col_start + len(strengths.strategic_thinking) - 1
+    r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
+    ws.merge_range(2, col_start, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], st_think_n), fmt)
+    fmt = wb.add_format({'align': 'center', 'font_color': 'black', 'bold': True, 'font_size': 12, 'num_format': '0%',
+                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Influencing')})
+    col_start = col_end + 2
+    col_end += len(strengths.strategic_thinking) + 1
+    box_col_start = len(strengths.strategic_thinking) + 2
+    box_col_end = box_col_start + len(strengths.influencing) - 1
+    r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
+    ws.merge_range(2, col_start, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], influencing_n), fmt)
+    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12, 'num_format': '0%',
+                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Relationship Building')})
+    col_start = col_end + 2
+    col_end += len(strengths.influencing) + 2
+    box_col_start = len(strengths.influencing) + 2
+    box_col_end = box_col_start + len(strengths.relationship_building) - 1
+    r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
+    ws.merge_range(2, col_start, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], influencing_n), fmt)
     # autofit the name column based on the longest name
     width = max([len(s[0]) for s in info])
     ws.set_column(0, 0, width)
