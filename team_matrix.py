@@ -5,6 +5,56 @@
 import xlsxwriter
 import strengths
 
+def write_domain_header(wb, ws, row, start_col, domain):
+    first_fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
+                               'rotation': 60, 'font_color': 'white', 'bg_color': '#25457E', 'top': 2,
+                               'left': 2})
+    mid_fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
+                             'rotation': 60, 'font_color': 'white', 'bg_color': '#25457E', 'top': 2})
+    last_fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
+                              'rotation': 60, 'font_color': 'white', 'bg_color': '#25457E', 'top': 2,
+                              'right': 2})
+    last = len(domain) - 1
+    for idx, s in enumerate(domain):
+        if idx == 0:
+            fmt = first_fmt
+        elif idx == last:
+            fmt = last_fmt
+        else:
+            fmt = mid_fmt
+        ws.write_string(row, start_col + idx, s, fmt)
+
+def build_matrix(wb, ws, info):
+    # put in the header info and setup the entire worksheet
+    fmt = wb.add_format({'valign': 'vcenter', 'bold': True, 'font_size': 16, 'align': 'left'})
+    ws.merge_range(0, 0, 1, 2, 'Team Strengths Matrix', fmt)
+    fmt = wb.add_format({'valign': 'vcenter', 'bold': True, 'font_size': 11, 'align': 'center'})
+    ws.merge_range(2, 0, 2, 2, 'Team Name', fmt)
+    ws.hide_gridlines(2)
+    # build the header row of strengths
+    fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
+                         'rotation': 60, 'font_color': 'white', 'bg_color': '#25457E',
+                         'top': 2, 'left': 2, 'right': 2})
+    ws.write_string(3, 0, 'Name', fmt)
+    spacer_fmt = wb.add_format({'bg_color': 'black', 'top': 2, 'left': 2, 'right': 2})
+    start_col = 1
+    write_domain_header(wb, ws, 3, start_col, strengths.executing)
+    start_col += len(strengths.executing)
+    ws.write_string(3, start_col, '', spacer_fmt)
+    start_col += 1
+    write_domain_header(wb, ws, 3, start_col, strengths.strategic_thinking)
+    start_col += len(strengths.strategic_thinking)
+    ws.write_string(3, start_col, '', spacer_fmt)
+    start_col += 1
+    write_domain_header(wb, ws, 3, start_col, strengths.influencing)
+    start_col += len(strengths.influencing)
+    ws.write_string(3, start_col, '', spacer_fmt)
+    start_col += 1
+    write_domain_header(wb, ws, 3, start_col, strengths.relationship_building)
+    start_col += len(strengths.relationship_building)
+    ws.set_column(1, start_col, 4)
+
+
 def build_names_and_strengths(wb, ws, info):
     # write the header row
     ws.write_string(0, 0, 'Name')
@@ -42,6 +92,7 @@ def generate(fname, info):
     ws_matrix = wb.add_worksheet('Matrix')
     ws_ns = wb.add_worksheet('Names and Strengths')
     build_names_and_strengths(wb, ws_ns, info)
+    build_matrix(wb, ws_matrix, info)
     wb.close()
 
 if __name__ == '__main__':
