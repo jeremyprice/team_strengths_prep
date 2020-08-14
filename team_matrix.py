@@ -33,22 +33,30 @@ def build_matrix(wb, ws, info):
     ws.merge_range(2, 0, 2, 2, 'Team Name', fmt)
     ws.hide_gridlines(2)
     # build the domain headers
-    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12,
-                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Executing')})
+    fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12,
+                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2,
+                         'bg_color': strengths.domain_color('Executing'),
+                         'font_color': strengths.domain_txt_color('Executing')})
     col_end = 2 + len(strengths.executing)
     ws.merge_range(1, 3, 1, col_end, 'Executing', fmt)
-    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12,
-                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Strategic Thinking')})
+    fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12,
+                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2,
+                         'bg_color': strengths.domain_color('Strategic Thinking'),
+                         'font_color': strengths.domain_txt_color('Strategic Thinking')})
     col_start = col_end + 2
     col_end = col_start + len(strengths.strategic_thinking) - 1
     ws.merge_range(1, col_start, 1, col_end, 'Strategic Thinking', fmt)
-    fmt = wb.add_format({'align': 'center', 'font_color': 'black', 'bold': True, 'font_size': 12,
-                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Influencing')})
+    fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12,
+                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2,
+                         'bg_color': strengths.domain_color('Influencing'),
+                         'font_color': strengths.domain_txt_color('Influencing')})
     col_start = col_end + 2
     col_end = col_start + len(strengths.influencing) - 1
     ws.merge_range(1, col_start, 1, col_end, 'Influencing', fmt)
-    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12,
-                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Relationship Building')})
+    fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12,
+                         'valign': 'bottom', 'top': 2, 'left': 2, 'right': 2,
+                         'bg_color': strengths.domain_color('Relationship Building'),
+                         'font_color': strengths.domain_txt_color('Relationship Building')})
     col_start = col_end + 2
     col_end = col_start + len(strengths.relationship_building) - 1
     ws.merge_range(1, col_start, 1, col_end, 'Relationship Building', fmt)
@@ -131,7 +139,6 @@ def build_matrix(wb, ws, info):
     insert_totals(ws, row, start_col, start_col+len(strengths.influencing), row_range, num_fmt)
     start_col += len(strengths.influencing) + 1  # space column
     insert_totals(ws, row, start_col, start_col+len(strengths.relationship_building), row_range, num_fmt)
-
     # put the team and domain counts at the bottom left
     row = 33 + len(info)
     ws.write_string(row, 0, 'team n')
@@ -156,39 +163,107 @@ def build_matrix(wb, ws, info):
     ws.write_string(row, 0, 'Rel Building n')
     ws.write_formula(row, 1, '=9*{}'.format(team_n))
     rel_build_n = xl_rowcol_to_cell(row, 1)
+    # add the domain breakdown for the chart
+    row += 1
+    ws.write_string(row, 1, 'Domain Breakdown')
+    db_cell = xl_rowcol_to_cell(row, 1)
+    row += 1
+    percent_fmt = wb.add_format({'num_format': '0%'})
+    p_col = 3
+    for offset, domain in enumerate(strengths.domains):
+        ws.write_string(row + offset, 0, domain)
+        p_addr = xl_rowcol_to_cell(2, p_col)
+        ws.write_formula(row + offset, 1, '={}'.format(p_addr), percent_fmt)
+        p_col += strengths.domain_counts[domain] + 1
+    label_cells = (xl_rowcol_to_cell(row, 0), xl_rowcol_to_cell(row+3, 0))
+    p_cells = (xl_rowcol_to_cell(row, 1), xl_rowcol_to_cell(row+3, 1))
     # put the domain header calculations up top
-    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12, 'num_format': '0%',
-                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Executing')})
+    fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12, 'num_format': '0%',
+                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2,
+                         'bg_color': strengths.domain_color('Executing'),
+                         'font_color': strengths.domain_txt_color('Executing')})
     col_end = 2 + len(strengths.executing)
     r = (xl_rowcol_to_cell(4, 1), xl_rowcol_to_cell(3+len(info), len(strengths.executing)))
     ws.merge_range(2, 3, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], exec_n), fmt)
-    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12, 'num_format': '0%',
-                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Strategic Thinking')})
+    fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12, 'num_format': '0%',
+                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2,
+                         'bg_color': strengths.domain_color('Strategic Thinking'),
+                         'font_color': strengths.domain_txt_color('Strategic Thinking')})
     col_start = col_end + 2
     col_end += len(strengths.executing)
     box_col_start = len(strengths.executing) + 2
     box_col_end = box_col_start + len(strengths.strategic_thinking) - 1
     r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
     ws.merge_range(2, col_start, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], st_think_n), fmt)
-    fmt = wb.add_format({'align': 'center', 'font_color': 'black', 'bold': True, 'font_size': 12, 'num_format': '0%',
-                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Influencing')})
+    fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12, 'num_format': '0%',
+                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2,
+                         'bg_color': strengths.domain_color('Influencing'),
+                         'font_color': strengths.domain_txt_color('Influencing')})
     col_start = col_end + 2
     col_end += len(strengths.strategic_thinking) + 1
     box_col_start = len(strengths.strategic_thinking) + 2
     box_col_end = box_col_start + len(strengths.influencing) - 1
     r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
     ws.merge_range(2, col_start, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], influencing_n), fmt)
-    fmt = wb.add_format({'align': 'center', 'font_color': 'white', 'bold': True, 'font_size': 12, 'num_format': '0%',
-                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2, 'bg_color': strengths.domain_color('Relationship Building')})
+    fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12, 'num_format': '0%',
+                         'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2,
+                         'bg_color': strengths.domain_color('Relationship Building'),
+                         'font_color': strengths.domain_txt_color('Relationship Building')})
     col_start = col_end + 2
     col_end += len(strengths.influencing) + 2
     box_col_start = len(strengths.influencing) + 2
     box_col_end = box_col_start + len(strengths.relationship_building) - 1
     r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
     ws.merge_range(2, col_start, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], influencing_n), fmt)
+    # put the percentages at the bottom of each Strength column
+    percent_fmt = wb.add_format({'bold': True, 'font_size': 10, 'num_format': '0%'})
+    p_row = len(info) + 5
+    start_col = 1
+    for col in range(start_col, start_col + len(strengths.executing)):
+        total = xl_rowcol_to_cell(p_row-1, col)
+        ws.write_formula(p_row, col, '={}/{}'.format(total, team_n), percent_fmt)
+    start_col += len(strengths.executing) + 1
+    for col in range(start_col, start_col + len(strengths.strategic_thinking)):
+        total = xl_rowcol_to_cell(p_row-1, col)
+        ws.write_formula(p_row, col, '={}/{}'.format(total, team_n), percent_fmt)
+    start_col += len(strengths.strategic_thinking) + 1
+    for col in range(start_col, start_col + len(strengths.influencing)):
+        total = xl_rowcol_to_cell(p_row-1, col)
+        ws.write_formula(p_row, col, '={}/{}'.format(total, team_n), percent_fmt)
+    start_col += len(strengths.influencing) + 1
+    for col in range(start_col, start_col + len(strengths.relationship_building)):
+        total = xl_rowcol_to_cell(p_row-1, col)
+        ws.write_formula(p_row, col, '={}/{}'.format(total, team_n), percent_fmt)
+    # build the description boxes
+    d_row = len(info) + 7
+    start_col = 1
+    for domain in strengths.domain_order:
+        end_col = start_col + strengths.domain_counts[domain] - 1
+        build_description_box(wb, ws, domain, d_row, start_col, end_col)
+        start_col = end_col + 2
     # autofit the name column based on the longest name
     width = max([len(s[0]) for s in info])
     ws.set_column(0, 0, width)
+
+def build_description_box(wb, ws, domain, row, start_col, end_col):
+    title_fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 11,
+                               'valign': 'vcenter', 'border': 2,
+                               'bg_color': strengths.domain_color(domain),
+                               'font_color': strengths.domain_txt_color(domain)})
+    short_fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 10,
+                               'valign': 'vcenter', 'border': 2, 'bg_color': '#5A88D6',
+                               'font_color': 'white'})
+    long_fmt = wb.add_format({'align': 'left', 'bold': False, 'font_size': 10,
+                              'valign': 'top', 'border': 2, 'text_wrap': True,
+                              'bg_color': 'white', 'font_color': 'black'})
+    ws.merge_range(row, start_col, row, end_col, domain.upper(), title_fmt)
+    row += 1
+    ws.merge_range(row, start_col, row, end_col,
+                   strengths.domain_short_description[domain], short_fmt)
+    row += 1
+    ws.merge_range(row, start_col, row, end_col,
+                   strengths.domain_long_description[domain], long_fmt)
+    ws.set_row(row, 15 * 4)  # 15 is the default row height
 
 def insert_totals(ws, row, start_col, end_col, row_range, fmt):
     formula = '=COUNTIF({0:s}:{1:s},"x")'
