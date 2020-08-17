@@ -177,7 +177,19 @@ def build_matrix(wb, ws, info):
         p_col += strengths.domain_counts[domain] + 1
     label_cells = (xl_rowcol_to_cell(row, 0), xl_rowcol_to_cell(row+3, 0))
     p_cells = (xl_rowcol_to_cell(row, 1), xl_rowcol_to_cell(row+3, 1))
-    # put the domain header calculations up top
+    # add the chart
+    chart = wb.add_chart({'type': 'doughnut'})
+    chart.add_series({
+        'name': '=Matrix!{}'.format(db_cell),
+        'categories': "=Matrix!{}:{}".format(*label_cells),
+        'values': "=Matrix!{}:{}".format(*p_cells),
+        'points': [{'fill': {'color': strengths.domain_color(domain)}} for domain in strengths.domain_order]
+    })
+    chart.set_legend({'none': True})
+    chart.set_style(10)
+    chart_loc = xl_rowcol_to_cell(len(info)+10, 0)
+    ws.insert_chart(chart_loc, chart)
+    # put the domain header calculations up top - TODO: need to fix this
     fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12, 'num_format': '0%',
                          'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2,
                          'bg_color': strengths.domain_color('Executing'),
@@ -201,7 +213,7 @@ def build_matrix(wb, ws, info):
                          'font_color': strengths.domain_txt_color('Influencing')})
     col_start = col_end + 2
     col_end += len(strengths.strategic_thinking) + 1
-    box_col_start = len(strengths.strategic_thinking) + 2
+    box_col_start += len(strengths.strategic_thinking) + 1
     box_col_end = box_col_start + len(strengths.influencing) - 1
     r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
     ws.merge_range(2, col_start, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], influencing_n), fmt)
@@ -211,10 +223,10 @@ def build_matrix(wb, ws, info):
                          'font_color': strengths.domain_txt_color('Relationship Building')})
     col_start = col_end + 2
     col_end += len(strengths.influencing) + 2
-    box_col_start = len(strengths.influencing) + 2
+    box_col_start += len(strengths.influencing) + 1
     box_col_end = box_col_start + len(strengths.relationship_building) - 1
     r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
-    ws.merge_range(2, col_start, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], influencing_n), fmt)
+    ws.merge_range(2, col_start, 2, col_end, '=(COUNTIF({}:{},"x"))/{}'.format(r[0], r[1], rel_build_n), fmt)
     # put the percentages at the bottom of each Strength column
     percent_fmt = wb.add_format({'bold': True, 'font_size': 10, 'num_format': '0%'})
     p_row = len(info) + 5

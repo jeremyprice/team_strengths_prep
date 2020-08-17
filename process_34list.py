@@ -4,6 +4,7 @@ from operator import itemgetter
 import sys
 import xlrd
 import xlsxwriter
+import team_matrix
 
 def process(fname, base_fname):
     '''process the given 34 list Excel file and generate the name tents and the team matrix
@@ -11,6 +12,9 @@ def process(fname, base_fname):
     @arg base_fname: the base filename string to prepend to any generated files {}-matrix.xlsx
     '''
     info = load_info(fname, base_fname)
+    mat_info = [n[1:] for n in info]  # remove the last, first column
+    matrix_fname = base_fname + '-matrix.xlsx'
+    team_matrix.generate(matrix_fname, mat_info)
 
 def save_34list(info, base_fname):
     '''save the updated and sorted data to a new Excel file'''
@@ -64,6 +68,7 @@ def load_info(fname, base_fname):
     # sort it by first name
     info.sort(key=itemgetter(1))
     save_34list(info, base_fname)
+    return info
 
 if __name__ == '__main__':
     process(*sys.argv[1:])
