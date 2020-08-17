@@ -202,7 +202,7 @@ def build_matrix(wb, ws, info):
                          'bg_color': strengths.domain_color('Strategic Thinking'),
                          'font_color': strengths.domain_txt_color('Strategic Thinking')})
     col_start = col_end + 2
-    col_end += len(strengths.executing)
+    col_end = col_start + len(strengths.strategic_thinking) - 1
     box_col_start = len(strengths.executing) + 2
     box_col_end = box_col_start + len(strengths.strategic_thinking) - 1
     r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
@@ -212,7 +212,7 @@ def build_matrix(wb, ws, info):
                          'bg_color': strengths.domain_color('Influencing'),
                          'font_color': strengths.domain_txt_color('Influencing')})
     col_start = col_end + 2
-    col_end += len(strengths.strategic_thinking) + 1
+    col_end = col_start + len(strengths.strategic_thinking) - 1
     box_col_start += len(strengths.strategic_thinking) + 1
     box_col_end = box_col_start + len(strengths.influencing) - 1
     r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
@@ -222,7 +222,7 @@ def build_matrix(wb, ws, info):
                          'bg_color': strengths.domain_color('Relationship Building'),
                          'font_color': strengths.domain_txt_color('Relationship Building')})
     col_start = col_end + 2
-    col_end += len(strengths.influencing) + 2
+    col_end = col_start + len(strengths.relationship_building) - 1
     box_col_start += len(strengths.influencing) + 1
     box_col_end = box_col_start + len(strengths.relationship_building) - 1
     r = (xl_rowcol_to_cell(4, box_col_start), xl_rowcol_to_cell(3+len(info), box_col_end))
