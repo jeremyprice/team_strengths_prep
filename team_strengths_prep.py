@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
+import glob
 import os
 import os.path
 import shutil
 import sys
 import tempfile
+import zipfile
 import process_34report
 import process_34list
 import nametents
@@ -33,11 +35,11 @@ def main():
     r34_dir = '34reports'
     p21_dir = 'p21'
     # TODO: use a temporary staging dir so it will clean up the files when we're done
-    # staging_dir = tempfile.TemporaryDirectory()
-    # staging_dir_name = staging_dir.name
-    staging_dir_name = 'staging'
+    staging_dir = tempfile.TemporaryDirectory()
+    staging_dir_name = staging_dir.name
+    zip_dir = 'zips'
     try:
-        os.mkdir(staging_dir_name)
+        os.mkdir(zip_dir)
     except FileExistsError:
         pass
     prep_staging(staging_dir_name, r34_dir, p21_dir, r34_fname, list34_fname)
@@ -47,11 +49,19 @@ def main():
     list34_fname = os.path.basename(list34_fname)
     process_34report.process(r34_fname, r34_dir, p21_dir, base_fname)
     process_34list.process(list34_fname, base_fname)
-    # if everything went well we can get rid of the xls 34list file
+    # if everything went well we can get rid of the xls 34list file, the fonts/, and the image/
     os.remove(list34_fname)
+    shutil.rmtree('fonts')
+    shutil.rmtree('images')
     # zip up the results for sending back
-
+    zip_fname = base_fname + '-materials.zip'
+    file_specs = ('*.xlsx', '*.pdf', '34reports/*', 'p21/*')
+    with zipfile.ZipFile(zip_fname, mode='w', compression=zipfile.ZIP_DEFLATED) as zip:
+        for fs in file_specs:
+            for fname in glob.iglob(fs):
+                zip.write(fname)
     os.chdir(prev_dir)
+    shutil.copyfile(os.path.join(staging_dir_name, zip_fname), os.path.join(zip_dir, zip_fname))
 
 if __name__ == '__main__':
     main()
