@@ -6,6 +6,11 @@ import xlsxwriter
 import strengths
 from xlsxwriter.utility import xl_rowcol_to_cell
 
+
+# TODO: need to clean up and refactor - everything is relative and counted instead of pre-calculated
+#       Maybe do a class with all the columns, rows, addresses, etc?
+
+
 def write_domain_header(wb, ws, row, start_col, domain):
     first_fmt = wb.add_format({'valign': 'bottom', 'bold': True, 'font_size': 10, 'align': 'left',
                                'rotation': 60, 'font_color': 'white', 'bg_color': '#25457E', 'top': 2,
@@ -189,7 +194,7 @@ def build_matrix(wb, ws, info):
     chart.set_style(10)
     chart_loc = xl_rowcol_to_cell(len(info)+10, 0)
     ws.insert_chart(chart_loc, chart)
-    # put the domain header calculations up top - TODO: need to fix this
+    # put the domain header calculations up top
     fmt = wb.add_format({'align': 'center', 'bold': True, 'font_size': 12, 'num_format': '0%',
                          'valign': 'bottom', 'bottom': 2, 'left': 2, 'right': 2,
                          'bg_color': strengths.domain_color('Executing'),
@@ -317,7 +322,7 @@ def build_names_and_strengths(wb, ws, info):
 
 def generate(fname, info):
     '''generate the team matrix Excel document
-    @arg fname: the filename to save the Excel doc todo
+    @arg fname: the filename to save the Excel doc to
     @arg info: a sequence of Name, Strengths[1:35]
     '''
     wb = xlsxwriter.Workbook(fname)
