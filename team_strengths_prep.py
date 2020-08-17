@@ -7,6 +7,7 @@ import sys
 import tempfile
 import process_34report
 import process_34list
+import nametents
 
 def prep_staging(staging_dir, r34_dir, p21_dir, r34_fname, list34_fname):
     for d in (r34_dir, p21_dir):
@@ -23,6 +24,7 @@ def prep_staging(staging_dir, r34_dir, p21_dir, r34_fname, list34_fname):
     fname = os.path.basename(list34_fname)
     new_list34_fname = os.path.join(staging_dir, fname)
     shutil.copyfile(list34_fname, new_list34_fname)
+    nametents.prep_staging(staging_dir)
 
 def main():
     r34_fname = sys.argv[1]

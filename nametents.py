@@ -2,6 +2,8 @@
 
 import sys
 import os
+import os.path
+import shutil
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
@@ -31,6 +33,27 @@ def load_fonts():
     fsb_ttf = os.path.join(folder, 'FiraSans-Bold.ttf')
     pdfmetrics.registerFont(TTFont("FiraSans", fs_ttf))
     pdfmetrics.registerFont(TTFont("FiraSans Bold", fsb_ttf))
+
+
+def prep_staging(staging_dir):
+    for d in ('fonts', 'images'):  # create the storage dirs
+        newdir = os.path.join(staging_dir, d)
+        try:
+            os.mkdir(newdir)
+        except FileExistsError:
+            # clear the directory if it already exists
+            shutil.rmtree(newdir, ignore_errors=True)
+            os.mkdir(newdir)
+    # need to copy over the fonts and the image
+    book_fname = 'fonts/FiraSans-Book.ttf'
+    new_book = os.path.join(staging_dir, book_fname)
+    shutil.copyfile(book_fname, new_book)
+    bold_fname = 'fonts/FiraSans-Bold.ttf'
+    new_bold = os.path.join(staging_dir, bold_fname)
+    shutil.copyfile(bold_fname, new_bold)
+    image = 'images/rackspace-logo.png'
+    new_image = os.path.join(staging_dir, image)
+    shutil.copyfile(image, new_image)
 
 
 def set_pdf_file_defaults(canvas):

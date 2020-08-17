@@ -54,13 +54,11 @@ def split_and_extract(fname, r34_outdir, p21_outdir, base_fname):
         stop_page_num = start_page_num + 25  # we only need the first 25 pages since the last is blank
         p21 = 20
         person_name = find_name(doc[start_page_num])
-        print(person_name)
         if check_for_caution(doc[start_page_num]):
             stop_page_num += 1
             p21 += 1
         r34_fname = fname_34fmt.format(person_name)
         p21_fname = fname_21fmt.format(person_name)
-        print("Page {}: {}".format(start_page_num, report_num))
         doc.select(range(start_page_num, stop_page_num))
         doc.save(r34_fname, garbage=4, clean=1, deflate=1)
         doc.select([p21])

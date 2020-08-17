@@ -5,6 +5,7 @@ import sys
 import xlrd
 import xlsxwriter
 import team_matrix
+import nametents
 
 def process(fname, base_fname):
     '''process the given 34 list Excel file and generate the name tents and the team matrix
@@ -15,6 +16,9 @@ def process(fname, base_fname):
     mat_info = [n[1:] for n in info]  # remove the last, first column
     matrix_fname = base_fname + '-matrix.xlsx'
     team_matrix.generate(matrix_fname, mat_info)
+    nt_info = mat_info
+    nt_fname = base_fname + '-nametents.pdf'
+    nametents.create_one_file_nametents(nt_fname, nt_info)
 
 def save_34list(info, base_fname):
     '''save the updated and sorted data to a new Excel file'''
