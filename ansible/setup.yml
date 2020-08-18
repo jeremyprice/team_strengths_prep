@@ -94,7 +94,7 @@
         command: systemctl daemon-reload
 
       - name: restart app
-        service: name=strengths state=restarted
+        service: name=strengths_prep state=restarted
 
       - name: restart nginx
         service: name=nginx state=restarted
