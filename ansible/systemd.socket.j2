@@ -1,0 +1,9 @@
+[Unit]
+Description=strengths_prep gunicorn socket
+
+[Socket]
+ListenStream={{ prep_g_sock }}
+ListenStream=127.0.0.1:{{ prep_g_port }}
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,17 @@
+[Unit]
+Description=strengths_prep gunicorn daemon
+Requires=strengths_prep.socket
+After=network.target
+
+[Service]
+PIDFile=/run/strengths_prep/pid
+User={{ runtime_user }}
+Group={{ runtime_user }}
+WorkingDirectory={{ install_directory }}
+ExecStart=/usr/local/bin/gunicorn --workers 4 --pid /run/strengths/pid --b localhost:{{ prep_g_port }} server:app
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
