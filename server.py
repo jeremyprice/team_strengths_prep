@@ -42,7 +42,7 @@ def setup_logging():
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads/')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
-ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'pdf'}
+ALLOWED_EXTENSIONS = {'xls', 'pdf'}
 
 def allowed_file(filename):
     return '.' in filename and \
