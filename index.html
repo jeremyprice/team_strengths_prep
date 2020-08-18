@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Team Strengths Prep Generator</title>
+  </head>
+  <body>
+    <h1>Team Strengths Prep Generator</h1>
+    <div class="col-md-10">
+      <form action="/generate" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="prefixInput">Prefix - the string to put before all the files (no spaces, please)</label>
+          <input type="text" class="form-control" id="prefixInput" name="prefixInput" placeholder="YYYYMMDD-Name" required="required"/>
+        </div>
+        <div class="form-group">
+          <label for="listInput">List File - the "Theme Sequence Excel Export (All 34)" file from Gallup</label>
+          <input type="file" class="form-control" id="listFile" name="listFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required="required"/>
+        </div>
+        <div class="form-group">
+          <label for="reportInput">34 Report File - the "CliftonStrengths 34 Report" file from Gallup</label>
+          <input type="file" class="form-control" id="reportFile" name="reportFile" accept="application/pdf" required="required"/>
+        </div>
+        <div class="form-group d-none">
+          <input class="form-control" id="input-strengths" name="input-strengths" type="text" placeholder="strengths"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

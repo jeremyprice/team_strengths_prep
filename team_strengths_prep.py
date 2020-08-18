@@ -32,9 +32,12 @@ def main():
     r34_fname = sys.argv[1]
     list34_fname = sys.argv[2]
     base_fname = sys.argv[3]
+    prep(r34_fname, list34_fname, base_fname)
+
+def prep(r34_fname, list34_fname, base_fname):
     r34_dir = '34reports'
     p21_dir = 'p21'
-    # TODO: use a temporary staging dir so it will clean up the files when we're done
+    # use a temporary staging dir so it will clean up the files when we're done
     staging_dir = tempfile.TemporaryDirectory()
     staging_dir_name = staging_dir.name
     zip_dir = 'zips'
@@ -61,7 +64,10 @@ def main():
             for fname in glob.iglob(fs):
                 zip.write(fname)
     os.chdir(prev_dir)
-    shutil.copyfile(os.path.join(staging_dir_name, zip_fname), os.path.join(zip_dir, zip_fname))
+    tmp_zip = os.path.join(staging_dir_name, zip_fname)
+    new_zip = os.path.join(zip_dir, zip_fname)
+    shutil.copyfile(tmp_zip, new_zip)
+    return new_zip
 
 if __name__ == '__main__':
     main()
