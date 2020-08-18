@@ -49,11 +49,11 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/')
+@app.route('/prep')
 def index():
     return send_file('index.html')
 
-@app.route('/generate', methods=['POST', 'GET'])
+@app.route('/prep/generate', methods=['POST', 'GET'])
 def generate():
     if request.method == 'GET':  # if we have a GET, send them to the root
         return redirect('/')
