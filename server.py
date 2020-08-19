@@ -50,6 +50,7 @@ def allowed_file(filename):
 
 
 @app.route('/prep')
+@app.route('/prep/')
 def index():
     return send_file('index.html')
 
@@ -78,17 +79,6 @@ def generate():
         reportFile.close()
     zip_results = team_strengths_prep.prep(reportFilename, listFilename, prefix)
     return send_file(zip_results, as_attachment=True)
-
-
-@app.route('/python/')
-def python_dir_list():
-    files = sorted(os.listdir('python/'))
-    return render_template('files.html', files=files, path='Python')
-
-
-@app.route('/python/<fname>')
-def serve_python(fname):
-    return send_from_directory('python/', fname)
 
 
 setup_paths()
