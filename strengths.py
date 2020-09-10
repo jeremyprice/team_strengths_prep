@@ -14,7 +14,7 @@ influencing = ('Activator', 'Command', 'Communication', 'Competition', 'Maximize
 relationship_building = ('Adaptability', 'Connectedness', 'Developer', 'Empathy', 'Harmony', 'Includer',
                          'Individualization', 'Positivity', 'Relator')
 
-use_old_colors = True
+use_old_colors = False
 
 old_domain_colors = {'Executing': '#48255A', 'Strategic Thinking': '#840003',
                      'Influencing':'#EEA823', 'Relationship Building': '#1D3661'}
