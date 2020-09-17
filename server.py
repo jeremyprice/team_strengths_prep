@@ -73,10 +73,16 @@ def generate():
         listFilename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(listFile.filename))
         listFile.save(listFilename)
         listFile.close()
+    else:
+        app_log.error('invalid filename for the list file: {!r}'.format(listFile.filename))
+        return 'Error with the list file'
     if reportFile and allowed_file(reportFile.filename):
         reportFilename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(reportFile.filename))
         reportFile.save(reportFilename)
         reportFile.close()
+    else:
+        app_log.error('invalid filename for the report file: {!r}'.format(reportFile.filename))
+        return 'Error with the report file'
     zip_results = team_strengths_prep.prep(reportFilename, listFilename, prefix)
     return send_file(zip_results, as_attachment=True)
 
